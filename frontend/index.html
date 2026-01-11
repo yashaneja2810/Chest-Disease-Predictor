@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chest X-Ray Disease Prediction | AI Healthcare</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="8" fill="#3B82F6"/>
+                        <path d="M20 10L20 30M10 20L30 20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <h1>Chest X-Ray AI</h1>
+                </div>
+                <div class="header-status">
+                    <span class="status-indicator" id="modelStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Checking...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2 class="hero-title">AI-Powered Chest X-Ray Analysis</h2>
+                <p class="hero-subtitle">Upload chest X-ray images to detect pneumonia using deep learning</p>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-area" id="uploadArea">
+                        <svg class="upload-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M32 42V22M32 22L24 30M32 22L40 30" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M52 42V50C52 52.2091 50.2091 54 48 54H16C13.7909 54 12 52.2091 12 50V42" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <h3>Upload X-Ray Images</h3>
+                        <p>Click to browse or drag and drop files here</p>
+                        <p class="upload-hint">Supported formats: JPG, JPEG, PNG (Max 16MB)</p>
+                        <input type="file" id="fileInput" accept="image/jpeg,image/jpg,image/png" multiple hidden>
+                        <button class="btn btn-primary" id="browseBtn">Choose Files</button>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="preview-section" id="previewSection" style="display: none;">
+                        <h3>Selected Images (<span id="imageCount">0</span>)</h3>
+                        <div class="preview-grid" id="previewGrid"></div>
+                        <div class="preview-actions">
+                            <button class="btn btn-secondary" id="clearBtn">Clear All</button>
+                            <button class="btn btn-primary" id="predictBtn">
+                                <span id="predictBtnText">Predict</span>
+                                <span class="spinner" id="spinner" style="display: none;"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h2 class="section-title">Prediction Results</h2>
+                <div class="results-grid" id="resultsGrid"></div>
+            </section>
+
+            <!-- Info Section -->
+            <section class="info-section">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-icon">🎯</div>
+                        <h3>High Accuracy</h3>
+                        <p>Our model achieves 92%+ accuracy using state-of-the-art ResNet50 architecture</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">⚡</div>
+                        <h3>Fast Results</h3>
+                        <p>Get instant predictions in seconds with our optimized deep learning model</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">🔒</div>
+                        <h3>Privacy First</h3>
+                        <p>Images are processed locally and deleted immediately after analysis</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">📊</div>
+                        <h3>Detailed Analysis</h3>
+                        <p>Receive confidence scores and detailed interpretations for each prediction</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Disclaimer -->
+            <section class="disclaimer">
+                <div class="disclaimer-card">
+                    <h3>⚠️ Medical Disclaimer</h3>
+                    <p>This is an educational AI project and should NOT be used for actual medical diagnosis. The predictions are for informational purposes only. Always consult qualified healthcare professionals for medical advice, diagnosis, or treatment.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Chest X-Ray AI | Built with ❤️ for Healthcare</p>
+            <p class="footer-links">
+                <a href="https://github.com" target="_blank">GitHub</a>
+                <span>•</span>
+                <a href="#" id="aboutLink">About</a>
+                <span>•</span>
+                <a href="#" id="apiLink">API Docs</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Modal for Detailed Results -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

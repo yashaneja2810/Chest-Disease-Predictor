@@ -1,0 +1,22 @@
+# Backend Dependencies for Chest X-Ray Prediction System
+
+# Web Framework
+Flask==3.0.0
+flask-cors==4.0.0
+Werkzeug==3.0.1
+
+# Deep Learning
+tensorflow==2.15.0
+# Alternative for CPU-only: tensorflow-cpu==2.15.0
+
+# Image Processing
+Pillow==10.1.0
+
+# Data Processing
+numpy==1.24.3
+
+# Utilities
+python-dotenv==1.0.0
+
+# Optional: For production deployment
+gunicorn==21.2.0  # For production WSGI server

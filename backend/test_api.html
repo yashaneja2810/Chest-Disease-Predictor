@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #3b82f6;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #334155;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        pre {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            border-left: 3px solid #3b82f6;
+        }
+        .success {
+            color: #10b981;
+        }
+        .error {
+            color: #ef4444;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 8px;
+            background: #475569;
+            border: 1px solid #64748b;
+            border-radius: 4px;
+            color: white;
+        }
+        .result-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Backend API Test Page</h1>
+        <p>This page tests if your Flask backend is working correctly. Current time: <span id="time"></span></p>
+
+        <div class="test-section">
+            <h2>Test 1: Health Check</h2>
+            <button onclick="testHealth()">Test /api/health</button>
+            <div class="result-box" id="health-result">Click button to test...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Model Info</h2>
+            <button onclick="testModelInfo()">Test /api/model-info</button>
+            <div class="result-box" id="model-result">Click button to test...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Prediction</h2>
+            <input type="file" id="fileInput" accept="image/*" onchange="previewImage()">
+            <button onclick="testPredict()">Test /api/predict</button>
+            <div class="result-box" id="predict-result">Upload an X-ray image and click button...</div>
+            <img id="preview" style="max-width: 300px; display: none; margin-top: 15px; border-radius: 4px;">
+        </div>
+
+        <div class="test-section">
+            <h2>Frontend Code Check</h2>
+            <button onclick="checkFrontendCode()">Verify JavaScript Version</button>
+            <div class="result-box" id="code-result">Click button to check...</div>
+        </div>
+    </div>
+
+    <script>
+        // Update time
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleTimeString();
+        }, 1000);
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <span class="success">✅ SUCCESS</span>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <span class="error">❌ FAILED</span>
+                    <pre>Error: ${error.message}</pre>
+                    <p>Is the Flask server running? Run: python backend/app.py</p>
+                `;
+            }
+        }
+
+        async function testModelInfo() {
+            const resultDiv = document.getElementById('model-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/model-info');
+                const data = await response.json();
+                
+                let classInfo = '<h3>Class Labels:</h3><ul>';
+                for (let [idx, name] of Object.entries(data.classes)) {
+                    classInfo += `<li>${idx}: ${name}</li>`;
+                }
+                classInfo += '</ul>';
+                
+                resultDiv.innerHTML = `
+                    <span class="success">✅ SUCCESS</span>
+                    ${classInfo}
+                    <details>
+                        <summary>Full Response</summary>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <span class="error">❌ FAILED</span>
+                    <pre>Error: ${error.message}</pre>
+                `;
+            }
+        }
+
+        function previewImage() {
+            const file = document.getElementById('fileInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function testPredict() {
+            const resultDiv = document.getElementById('predict-result');
+            const fileInput = document.getElementById('fileInput');
+            
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<span class="error">❌ Please select an image first!</span>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Predicting...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                const response = await fetch('http://localhost:5000/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    let probTable = '<h3>All Probabilities:</h3><table style="width: 100%; color: white;">';
+                    probTable += '<tr><th>Disease</th><th>Probability</th></tr>';
+                    for (let [disease, prob] of Object.entries(data.all_probabilities)) {
+                        probTable += `<tr><td>${disease}</td><td>${(prob * 100).toFixed(2)}%</td></tr>`;
+                    }
+                    probTable += '</table>';
+                    
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ PREDICTION SUCCESS</span>
+                        <h3>Result:</h3>
+                        <ul>
+                            <li><strong>Predicted Class:</strong> ${data.predicted_class}</li>
+                            <li><strong>Confidence:</strong> ${data.confidence_percentage}</li>
+                            <li><strong>Interpretation:</strong> ${data.interpretation}</li>
+                        </ul>
+                        ${probTable}
+                        <details>
+                            <summary>Full Response</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <span class="error">❌ PREDICTION FAILED</span>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <span class="error">❌ REQUEST FAILED</span>
+                    <pre>Error: ${error.message}</pre>
+                `;
+            }
+        }
+
+        function checkFrontendCode() {
+            const resultDiv = document.getElementById('code-result');
+            
+            // Check if the disease display mapping exists (from updated code)
+            const testCode = `
+                const diseaseDisplay = {
+                    'Normal': { emoji: '✅', text: 'NORMAL', class: 'normal' },
+                    'Covid-19': { emoji: '🦠', text: 'COVID-19', class: 'covid' },
+                    'Emphysema': { emoji: '🫁', text: 'EMPHYSEMA', class: 'disease' },
+                    'Pneumonia-Bacterial': { emoji: '⚠️', text: 'PNEUMONIA (Bacterial)', class: 'pneumonia' },
+                    'Pneumonia-Viral': { emoji: '⚠️', text: 'PNEUMONIA (Viral)', class: 'pneumonia' },
+                    'Tuberculosis': { emoji: '🔴', text: 'TUBERCULOSIS', class: 'disease' }
+                };
+            `;
+            
+            const cacheInfo = `
+                <h3>Expected Frontend Code:</h3>
+                <pre>${testCode}</pre>
+                <h3>How to Verify:</h3>
+                <ol>
+                    <li>Open main site: <a href="http://localhost:5000" target="_blank">http://localhost:5000</a></li>
+                    <li>Press F12 to open DevTools</li>
+                    <li>Go to Sources tab</li>
+                    <li>Open script.js</li>
+                    <li>Search for "diseaseDisplay"</li>
+                    <li>It should match the code above</li>
+                </ol>
+                <h3>If it doesn't match:</h3>
+                <ul>
+                    <li><span class="error">Your browser cached the OLD script.js!</span></li>
+                    <li>Press <strong>CTRL + SHIFT + DELETE</strong></li>
+                    <li>Clear "Cached images and files"</li>
+                    <li>Or use <strong>CTRL + F5</strong> to hard refresh</li>
+                </ul>
+            `;
+            
+            resultDiv.innerHTML = cacheInfo;
+        }
+    </script>
+</body>
+</html>
